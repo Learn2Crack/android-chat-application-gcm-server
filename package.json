@@ -1,0 +1,13 @@
+{
+	"name": "node-chat",
+	"version": "0.0.1",
+	"main": "app.js",
+	"dependencies": {
+		"express" : "~4.0.0", 
+		"mongoose" : "~3.8.8",	
+		"connect": "~2.14.4",
+		"request": "2.36.0"
+
+
+  }
+}
