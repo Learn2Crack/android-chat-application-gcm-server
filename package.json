@@ -4,7 +4,7 @@
 	"main": "app.js",
 	"dependencies": {
 		"express" : "~4.0.0", 
-		"mongoose" : "~3.8.8",	
+		"mysql" : "~2.5.3",	
 		"connect": "~2.14.4",
 		"request": "2.36.0"
 

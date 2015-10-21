@@ -1,73 +1,102 @@
-var mongoose = require('mongoose');
 var request = require('request');
-var user = require('./models.js');
+var mysql = require('mysql');
+ 
+var connection = mysql.createConnection(
+    {
+      host     : 'localhost',
+      user     : 'root',
+      password : 'root',
+      database : 'chat',
+    }
+);
+ 
+connection.connect();
+
 
 exports.login = function(name,mobno,reg_id,callback) {
 
-var newuser = new user({ 
-	name: name,
-	mobno: mobno, 
-	reg_id: reg_id});
+var data = {
+            
+            name    : name,
+            mobno :  mobno,
+            reg_id   : reg_id
+            
+        
+        };
+var que = "SELECT * from users WHERE mobno =" + mobno;
 
-user.find({mobno: mobno},function(err,users){
+ var query = connection.query(que, function(err, rows)
+        {
+          if(rows.length == 0){
+            var query = connection.query("INSERT INTO users set ? ",data, function(err, rows)
+        {
+  
+          callback({'response':"Sucessfully Registered"});
+    
+        });
+          }else {
 
-var len = users.length;
+           callback({'response':"User already Registered"});
 
-if(len == 0){
- 	newuser.save(function (err) {
-	
-	callback({'response':"Sucessfully Registered"});
-		
-});
-}else{
+          }
+      
+        });
+    
 
-	callback({'response':"User already Registered"});
-
-}});
 }
+
+
 exports.getuser = function(mobno,callback) {
 
-user.find(function(err,users){
 
-var len = users.length;
 
-if(len == 0){
- 	
-	
-	callback({'response':"No Users Registered"});
-		
+ var query = connection.query("SELECT * from users", function(err, rows)
+        {
+          if(rows.length == 0){
+            callback({'response':"No Users Registered"});
+          }else {
 
-}else{
-callback(removeUser(users, mobno));
-	
-}});
+          callback(removeUser(rows, mobno));
+
+          }
+      
+        });
+
 }
 
 
 exports.removeuser = function(mobno,callback) {
 
-user.remove({mobno:mobno},function(err,users){
+var que = "DELETE FROM users  WHERE mobno =" + mobno;
 
-	if(!err){
+var query = connection.query(que, function(err, rows)
+        {
+            
+             if(!err){
 
-		callback({'response':"Removed Sucessfully"});
-	}else{
-		callback({'response':"Error"});
-	}
-});
+    callback({'response':"Removed Sucessfully"});
+  }else{
+    callback({'response':"Error"});
+  }  
+        });
 }
 
 
 
 exports.send = function(fromn,fromu,to,msg,callback) {
 
-user.find({mobno: to},function(err,users){
-var len = users.length;
-if(len == 0){
-callback({'response':"Failure"});
-}else{
-	var to_id = users[0].reg_id;
-	var name = users[0].name;
+var que = "SELECT * from users WHERE mobno =" + to;
+
+ var query = connection.query(que, function(err, rows)
+        {
+          if(rows.length == 0){
+            callback({'response':"Failure"});
+        
+          }else {
+
+           
+	var to_id = rows[0].reg_id;
+	var name = rows[0].name;
 
 request(
     { method: 'POST', 
