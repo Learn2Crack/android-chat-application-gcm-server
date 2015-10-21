@@ -15,7 +15,7 @@ app.use(connect.urlencoded());
 
 // Routes
 
-require('./routes/routes.js')(app);
+require('./modules/routes.js')(app);
 
 app.listen(port);
 
